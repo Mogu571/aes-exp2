@@ -122,8 +122,8 @@ class CustomRatingPlugin {
             // 清空当前界面
             display_element.innerHTML = "";
             
-            // 使用传入的 jsPsych 实例（提高兼容性）
-            this.jsPsych.finishTrial({
+            // 使用全局 jsPsych 变量
+            jsPsych.finishTrial({
                 rating: parseFloat(ratingValue.toFixed(4))
             });
         });
@@ -137,11 +137,11 @@ class CustomRatingPlugin {
         document.addEventListener("keypress", handleKeyPress);
 
         // 清理键盘事件监听
-        const originalFinishTrial = this.jsPsych.finishTrial;
-        this.jsPsych.finishTrial = (data) => {
+        const originalFinishTrial = jsPsych.finishTrial;
+        jsPsych.finishTrial = (data) => {
             document.removeEventListener("keypress", handleKeyPress);
-            this.jsPsych.finishTrial = originalFinishTrial;
-            originalFinishTrial.call(this.jsPsych, data);
+            jsPsych.finishTrial = originalFinishTrial;
+            originalFinishTrial.call(jsPsych, data);
         };
     }
 }
