@@ -36,7 +36,7 @@ class CustomRatingPlugin {
                     <span>${trial.labelLeft}</span>
                     <span>${trial.labelRight}</span>
                 </div>
-                <div class="confirm-button" id="js-confirm-btn">Confirm</div>
+                <div class="confirm-button" id="js-confirm-btn">确认</div>
             </div>
         `;
         display_element.innerHTML = ratingHtml;
@@ -82,27 +82,66 @@ class CustomRatingPlugin {
             }
         };
 
+        // ✅ 添加触摸事件支持（移动设备兼容）
+        const handleTouchStart = (e) => {
+            isDragging = true;
+            e.preventDefault();
+        };
+
+        const handleTouchMove = (e) => {
+            if (isDragging) {
+                const touch = e.touches[0];
+                updateMarkerPosition(touch.clientX);
+            }
+        };
+
+        const handleTouchEnd = () => {
+            if (isDragging) isDragging = false;
+        };
+
         // 添加事件监听
         marker.addEventListener("mousedown", handleMouseDown);
+        marker.addEventListener("touchstart", handleTouchStart);
         slider.addEventListener("click", handleSliderClick);  // 点击滑动条
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
+        document.addEventListener("touchmove", handleTouchMove);
+        document.addEventListener("touchend", handleTouchEnd);
 
         // 7. 点击确定按钮：结束评分，返回数据
         confirmBtn.addEventListener("click", () => {
             // 清理事件监听
             marker.removeEventListener("mousedown", handleMouseDown);
+            marker.removeEventListener("touchstart", handleTouchStart);
             slider.removeEventListener("click", handleSliderClick);
             document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseup", handleMouseUp);
+            document.removeEventListener("touchmove", handleTouchMove);
+            document.removeEventListener("touchend", handleTouchEnd);
             
             // 清空当前界面
             display_element.innerHTML = "";
             
-            // 使用全局 jsPsych 变量
-            jsPsych.finishTrial({
+            // 使用传入的 jsPsych 实例（提高兼容性）
+            this.jsPsych.finishTrial({
                 rating: parseFloat(ratingValue.toFixed(4))
             });
         });
+
+        // 添加键盘支持：回车键确认
+        const handleKeyPress = (e) => {
+            if (e.key === "Enter") {
+                confirmBtn.click();
+            }
+        };
+        document.addEventListener("keypress", handleKeyPress);
+
+        // 清理键盘事件监听
+        const originalFinishTrial = this.jsPsych.finishTrial;
+        this.jsPsych.finishTrial = (data) => {
+            document.removeEventListener("keypress", handleKeyPress);
+            this.jsPsych.finishTrial = originalFinishTrial;
+            originalFinishTrial.call(this.jsPsych, data);
+        };
     }
 }
