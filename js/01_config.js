@@ -28,7 +28,15 @@ const GLOBAL_DATA = {
     subjectName: "",        // 被试姓名（录入后赋值）
     subjectGender: "",      // 被试性别（录入后赋值）
     experimentLog: [        // 实验数据日志（最终导出为TXT）
-        "被试信息：待录入",
+        "被试信息：待录入",   // 这一行将被实际的被试信息替换
         "图片序号\t图片类型\t美观度(0-1)\t观看时长(ms)"
     ]
 };
+
+// 添加数据下载相关的工具函数声明
+if (typeof downloadData === 'undefined') {
+    // 这些函数将在 03_timeline.js 中定义
+    var downloadData = null;
+    var saveBackupData = null;
+    var checkBackupData = null;
+}
