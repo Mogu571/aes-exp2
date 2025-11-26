@@ -350,7 +350,7 @@ function buildTimeline() {
                 currentImage.beautyScore = data.rating;
                 // 记录试次数据
                 GLOBAL_DATA.experimentLog.push(
-                    `${currentImage.imageId}\t${currentImage.imageType}\t${currentImage.beautyScore}\t${currentImage.imageViewTime}`
+                    `${currentImage.imageId}\t${currentImage.beautyScore}\t${currentImage.imageViewTime}`
                 );
                 // 备份数据
                 saveBackupData();
